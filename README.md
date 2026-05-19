@@ -1,53 +1,42 @@
-# RupeeCube
+# rest_tensors
 
-Welcome to RupeeCube! This repository contains code and resources for the RupeeCube project.
+**rest_tensors** is a linear algebra library, which aims at providing efficient tensor operations for the Rust-based electronic structure tool (REST).
+### Using rest_tensors
 
-## Overview
+- Several global environment variables should be specified  
+ 1) REST_FORTRAN_COMPILER:   The compiler to build a fortran library for effcient tensor operations:  `restmatr.f90` -> `librestmatr.so`  
+ 2) REST_EXT_DIR:            The path to store the fortran library: `librestmatr.so` after compilation 
+ 3) LD_LIBRARY_PATH:         attach REST_BLAS_DIR and REST_EXT_DIR to LD_LIBRARY_PATH: `export LD_LIBRARY_PATH="$REST_BLAS_DIR:$REST_EXT_DIR:$LD_LIBRARY_PATH"` 
+ 4) REST_BLAS_DIR:           The path to the openblas library  for `feature=openblas`
+ 5) MKLROOT:                 The path to the mkl library for `feature=intel-mkl`
 
-RupeeCube is a project designed to [add description of what this project does].
+ - Simply add the following to your Carto.toml file:
+```ignore
+ [dependencies]
+// replace the * by the latest version
+rest_tensors = "*"
+ ```
+ 
+ ### Fetures
 
-## Features
+ * [`MatrixFull`](MatrixFull): the `column-major` rank-2 tensor, i.e. `matrix`, which is used for the molecular geometries, 
+                orbital fyinformation instrumentcc, density matrix, and most of intermediate data for REST.  
+There are several relevant structures for matrix, which share the same trait, namely
+               [`BasicMatrix`](BasicMatrix), [`BasicMatrixOpt`](BasicMatrixOpt), [`MathMatrix`](MathMatrix) and so forth. 
+ * [`MatrixUpper`](MatrixUpper): the structure storing the upper triangle of the matrix, which is used for Hamiltonian matrix, and many other Hermitian matrices in the REST package.
+ * [`RIFull`](RIFull):  the `column-major` rank-3 tensor structure, which is used for the three-center integrals 
+                in the resoution-of-identity approximation (RI). For example, ri3ao, ri3mo, and so forth.   
+ **NOTE**:: Although RIFull is created for very specific purpose use in REST, most of the relevant operations provided here are quite general and can be easily extended to any other 3-rank tensors 
+ * [`ERIFull`](ERIFull): the `column-major` 4-dimention tensors for electronic repulsive integrals (ERI).  
+ **NOTE**:: ERIFull is created to handle the analytic electronic-repulsive integrals in REST. 
+ Because REST mainly uses the Resolution-of-Identity (RI) technique. The analytic ERI is provided for benchmark, and thus is not fully optimized.
 
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
 
-## Getting Started
+ *  Detailed usage of [`MatrixFull`](MatrixFull) can be find in the corresponding pages; while those of [`RIFull`] and [`ERIFull`] are not yet ready.
 
-### Prerequisites
+ ### To-Do-List
 
-- [List any prerequisites needed]
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/RupeeCube/RupeeCube.git
-   ```
-
-2. Navigate to the project directory:
-   ```bash
-   cd RupeeCube
-   ```
-
-3. [Add any setup instructions]
-
-## Usage
-
-[Add usage examples and instructions]
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-[Add license information]
-
-## Contact
-
-- GitHub: [@RupeeCube](https://github.com/RupeeCube)
-
----
-
-*Last updated: 2026-05-19*
+* Introduce more LAPACK and BLAS functions to the 2-dimention matrix struct in rest-tensors, like [`MatrixFull`](MatrixFull), [`MatrixFullSlice`](MatrixFullSlice), [`SubMatrixFull`](SubMatrixFull) and so forth.
+ * Reoptimize the API for the rank-3 tensor, mainly [`RIFull`](RIFull) and complete the detailed usage accordingly.
+ * Enable the ScaLAPCK (scalable linear algebra package) functions to the 2-dimention matrix struct in rest-tensors, like [`MatrixFull`](MatrixFull).
+ * Conversions between `rest_tensors` and `numpy` in python
